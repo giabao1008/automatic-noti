@@ -28,11 +28,12 @@ class MessageNotification implements ShouldQueue
     // Set timeout of a job
     public $timeout = 60;
     
-    protected $receiver_email;
+    protected $receiver_email, $full_name;
 
-    public function __construct($receiver_email)
+    public function __construct($receiver_email, $full_name)
     {
         $this->receiver_email = $receiver_email;
+        $this->full_name      = $full_name;
     }
 
     /**
@@ -41,9 +42,26 @@ class MessageNotification implements ShouldQueue
      * @return void
      */
     public function handle()
-    {
+    {   
+        // $email    = new \SendGrid\Mail\Mail();
+        // $email->setFrom("info@toliha.edu.vn", "TOLIHA");
+        // $email->setSubject("Nhắc nhở học tập");
+        // $email->addTo($this->receiver_email, $this->full_name);
+        // $email->addContent(
+        //     "text/html", "<strong>and easy to do anywhere, even with PHP</strong>"
+        // );
+        // $sendgrid = new \SendGrid(getenv('SENDGRID_API_KEY'));
+        // try {
+        //     $response = $sendgrid->send($email);
+        //     print $response->statusCode() . "\n";
+        //     print_r($response->headers());
+        //     print $response->body() . "\n";
+        // } catch (Exception $e) {
+        //     Log::channel('daily')->info($errors->getMessage() . ' - ' . $errors->getFile() . ' - ' . $errors->getLine() . "\r\n");
+        // }
+        
         try {
-            Mail::to($this->receiver_email)->send(new MessageNotificationEmail());            
+            Mail::to($this->receiver_email)->send(new MessageNotificationEmail($this->full_name));            
         } catch (\Exception $errors) {
             Log::channel('daily')->info($errors->getMessage() . ' - ' . $errors->getFile() . ' - ' . $errors->getLine() . "\r\n");
         }
