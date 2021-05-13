@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Log;
 
 class MessageNotificationEmail extends Mailable
 {
@@ -17,10 +18,11 @@ class MessageNotificationEmail extends Mailable
      * @return void
      */
      
-    
-    public function __construct()
+    public $full_name;
+
+    public function __construct($full_name)
     {
-        //
+        $this->full_name = $full_name;
     }
 
     /**
@@ -29,7 +31,9 @@ class MessageNotificationEmail extends Mailable
      * @return $this
      */
     public function build()
-    {
-        return $this->from('no-reply@gmail.com', 'Test')->view('mail.message_notification')->subject('You Have A Message');
+    {       
+        Log::channel('daily')->info("aloooo");
+
+        return $this->from('info@toliha.edu.vn', 'TOLIHA')->view('mail.message_notification')->subject('Nhắc nhở học tập');
     }
 }
