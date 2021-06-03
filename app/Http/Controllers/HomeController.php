@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Carbon;
+use Carbon\Carbon;
 use App\Jobs\GetConfig;
 
 class HomeController extends Controller

@@ -9,6 +9,8 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
+use App\Jobs\MessageNotification;
+
 class Query implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
@@ -24,7 +26,7 @@ class Query implements ShouldQueue
     protected $limit;
     protected $config;
 
-    public function __construct($query, $offset, $limit; $config)
+    public function __construct($query, $offset, $limit, $config)
     {
         //
         $this->query = $query;
