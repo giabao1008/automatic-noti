@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Config;
-use App\UserProduct;
 use App\Carbon;
-use App\Jobs\MessageNotification;
+use App\Jobs\Count;
 
 class HomeController extends Controller
 {
@@ -19,6 +17,17 @@ class HomeController extends Controller
 
         // $timeAgo = time() - $timeLoop;
         // $timeAgo = date('Y-m-d H:i:s', $timeAgo);
+       
+
+        // $query = UserProduct::select('web_user.uid AS uid', 'web_user.full_name as full_name', 'web_user.email as email', 'web_user_last_active.last_active')
+        //     ->join('web_user', 'web_user.uid', '=', 'vi_product_user_product.uid')
+        //     ->join('web_user_last_active', 'web_user_last_active.uid', '=', 'vi_product_user_product.uid')
+        //     ->whereNotNull('web_user.email')
+        //     ->whereNotNull('web_user_last_active.last_active')
+        //     ->where('web_user_last_active.last_active', '<', $timeAgo);
+        // Count::dispatch()->delay(Carbon::now()->addSeconds(5));
+        // $count = $query->count();
+        // var_dump($count); die;
         // $data    = UserProduct::select('web_user.uid AS uid', 'web_user.full_name as full_name', 'web_user.email as email', 'web_user_last_active.last_active')
         //     ->join('web_user', 'web_user.uid', '=', 'vi_product_user_product.uid')
         //     ->join('web_user_last_active', 'web_user_last_active.uid', '=', 'vi_product_user_product.uid')
@@ -27,7 +36,6 @@ class HomeController extends Controller
         //     ->where('web_user_last_active.last_active', '<', $timeAgo)
         //     ->get()
         //     ->toArray();
-        // // so sánh kiểu gì ta
 
         // $dupe = array();
         // foreach ($data as $key => $value) {
@@ -39,6 +47,6 @@ class HomeController extends Controller
         // }
         // $arrEmail = array_column($data, 'email');
 
-        MessageNotification::dispatch('bbing1212@gmail.com', 'Nin')->delay(Carbon::now()->addMinutes(1));
+        // MessageNotification::dispatch('bbing1212@gmail.com', 'Nin')->delay(Carbon::now()->addMinutes(1));
     }
 }

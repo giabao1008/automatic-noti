@@ -26,7 +26,7 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         $schedule->call('App\Http\Controllers\HomeController@message')
-                // ->cron('0 */5 * * *')
+                // ->dailyAt('03:00')
                 ->everyMinute()
                 ->sendOutputTo(public_path().'/logs/daily.log');
     }

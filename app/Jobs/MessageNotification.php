@@ -28,13 +28,13 @@ class MessageNotification implements ShouldQueue
     // Set timeout of a job
     public $timeout = 60;
     
-    protected $receiver_email, $full_name;
+    protected $receiver_email, $full_name, $content;
 
-    public function __construct($receiver_email, $full_name)
+    public function __construct($receiver_email, $full_name, $content)
     {
         $this->receiver_email = $receiver_email;
         $this->full_name      = $full_name;
-    }
+        $this->content = $content;
 
     /**
      * Execute the job.
@@ -43,29 +43,24 @@ class MessageNotification implements ShouldQueue
      */
     public function handle()
     {   
-        // $email    = new \SendGrid\Mail\Mail();
-        // $email->setFrom("info@toliha.edu.vn", "TOLIHA");
-        // $email->setSubject("Nhắc nhở học tập");
-        // $email->addTo($this->receiver_email, $this->full_name);
-        // $email->addContent(
-        //     "text/html", "<strong>and easy to do anywhere, even with PHP</strong>"
-        // );
-        // $sendgrid = new \SendGrid(getenv('SENDGRID_API_KEY'));
-        // try {
-        //     $response = $sendgrid->send($email);
-        //     print $response->statusCode() . "\n";
-        //     print_r($response->headers());
-        //     print $response->body() . "\n";
-        // } catch (Exception $e) {
-        //     Log::channel('daily')->info($errors->getMessage() . ' - ' . $errors->getFile() . ' - ' . $errors->getLine() . "\r\n");
-        // }
         
+        $email    = new \SendGrid\Mail\Mail();
+        $email->setFrom("info@toliha.edu.vn", "TOLIHA");
+        $email->setSubject("Nhắc nhở học tập");
+        $email->addTo("giabao1008@gmail.com", $this->full_name);
+        $email->addContent(
+            "text/html", $this->content
+        );
+        $sendgrid = new \SendGrid(getenv('SENDGRID_API_KEY'));
         try {
-            Mail::to($this->receiver_email)->send(new MessageNotificationEmail($this->full_name));            
-        } catch (\Exception $errors) {
+            $response = $sendgrid->send($email);
+            print $response->statusCode() . "\n";
+            print_r($response->headers());
+            print $response->body() . "\n";
+        } catch (Exception $e) {
             Log::channel('daily')->info($errors->getMessage() . ' - ' . $errors->getFile() . ' - ' . $errors->getLine() . "\r\n");
         }
 
-        sleep(3);
+        // sleep(3);
     }
 }

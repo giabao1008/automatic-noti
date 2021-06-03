@@ -19,10 +19,12 @@ class MessageNotificationEmail extends Mailable
      */
      
     public $full_name;
+    public $content;
 
-    public function __construct($full_name)
+    public function __construct($content)
     {
-        $this->full_name = $full_name;
+        // $this->full_name = $full_name;
+        $this->content = $content;
     }
 
     /**
