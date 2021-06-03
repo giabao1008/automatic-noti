@@ -59,7 +59,7 @@ class Count implements ShouldQueue
 
 		for($i = 0; $i < $totalTurn; $i++){
             $offset = $i*$limit;
-            $job = (new Query($query, $offset, $limit, $config)->delay(Carbon::now()->addSeconds(5));
+            $job = (new Query($query, $offset, $limit, $config)->delay(now()->addSeconds(5));
             app(Dispatcher::class)->dispatch($job);
 		}
 

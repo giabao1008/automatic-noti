@@ -10,6 +10,6 @@ class HomeController extends Controller
 
     public function message()
     {
-        GetConfig::dispatch()->delay(Carbon::now()->addMinutes(1));
+        GetConfig::dispatch()->delay(now()->addMinutes(1));
     }
 }
