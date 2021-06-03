@@ -2,16 +2,12 @@
 
 namespace App\Jobs;
 
-use App\UserProduct;
 use App\Jobs\Query;
-use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Contracts\Bus\Dispatcher;
 
 class Count implements ShouldQueue
 {
@@ -35,7 +31,7 @@ class Count implements ShouldQueue
 
     public function __construct($query, $config)
     {
-        $this->query = $query;
+        $this->query  = $query;
         $this->limit  = 200;
         $this->config = $config;
     }
@@ -46,23 +42,23 @@ class Count implements ShouldQueue
      * @return void
      */
     public function handle()
-    {       
-        $config = $this->config;
-        $limit = $this->limit;
-        $total = $this->query->count();
-		$totalTurn = ceil($total/$limit);
-
+    {
+        $config    = $this->config;
+        $limit     = $this->limit;
+        $total     = $this->query->count();
+        $totalTurn = ceil($total / $limit);
 
         // Tính toán xem với số lượng mail như này thì để delay bao nhiêu là hợp lí
-        $maxTimeCanSend = $config['hours'] - 1; // cứ trừ 1 tiếng cho an toàn :v
-        $maxMinutes     = $maxTimeCanSend*60;
-        $config['delay'] = ceil($maxMinutes/$total);
+        $maxTimeCanSend  = $config['hours'] - 1; // cứ trừ 1 tiếng cho an toàn :v
+        $maxMinutes      = $maxTimeCanSend * 60;
+        $config['delay'] = ceil($maxMinutes / $total);
 
-		for($i = 0; $i < $totalTurn; $i++){
-            $offset = $i*$limit;
-            $job = (new Query($query, $offset, $limit, $config)->delay(now()->addSeconds(5));
-            app(Dispatcher::class)->dispatch($job);
-		}
+        for ($i = 0; $i < $totalTurn; $i++) {
+            $offset = $i * $limit;
+
+            Query::dispatch($query, $offset, $limit, $config)
+                ->delay(now()->addSeconds(5));
+        }
 
     }
 }

@@ -50,7 +50,7 @@ class GetConfig implements ShouldQueue
             ->where('web_user_last_active.last_active', '<', $timeAgo)
             ->whereNotIn('web_user.email', $emailExcerpt);
 
-        $job = (new Count($query, $config)->delay(now()->addMinutes(5));
-        app(Dispatcher::class)->dispatch($job);
+        Count::dispatch($query, $config)
+                    ->delay(now()->addMinutes(5));
     }
 }
