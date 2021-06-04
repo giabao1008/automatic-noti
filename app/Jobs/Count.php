@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Jobs\Query;
+use App\UserProduct;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;

@@ -57,7 +57,7 @@ class Query implements ShouldQueue
             // to $row['email]
             // set 5 min
 
-            MessageNotification::dispatch($row['email', $row['full_name'], $mailContent])->delay(now()->addMinutes($config['delay']));
+            MessageNotification::dispatch($row['email', $row['full_name'], $mailContent])->delay(now()->addSeconds(4));
         }
 
     }
