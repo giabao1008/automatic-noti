@@ -9,6 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\DB;
 
 class Count implements ShouldQueue
 {
@@ -20,19 +21,12 @@ class Count implements ShouldQueue
      * @return void
      */
 
-    // Time to try a job
-    public $tries = 3;
-
-    // Set timeout of a job
-    public $timeout = 60;
-
     protected $query;
     protected $limit;
     protected $config;
 
-    public function __construct($query, $config)
+    public function __construct($config)
     {
-        $this->query  = $query;
         $this->limit  = 200;
         $this->config = $config;
     }
@@ -46,18 +40,31 @@ class Count implements ShouldQueue
     {
         $config    = $this->config;
         $limit     = $this->limit;
-        $total     = $this->query->count();
+        $timeLoop     = $config->hours* 3600;
+        $emailExcerpt = explode(',', $config->mail_excerpt);
+
+        $timeAgo = time() - $timeLoop;
+        $timeAgo = date('Y-m-d H:i:s', $timeAgo);
+        $query = UserProduct::select('web_user.uid AS uid', 'web_user.full_name as full_name', 'web_user.email as email', 'web_user_last_active.last_active')
+            ->join('web_user', 'web_user.uid', '=', 'vi_product_user_product.uid')
+            ->join('web_user_last_active', 'web_user_last_active.uid', '=', 'vi_product_user_product.uid')
+            ->whereNotNull('web_user.email')
+            ->whereNotNull('web_user_last_active.last_active')
+            ->where('web_user_last_active.last_active', '<', $timeAgo)
+            ->whereNotIn('web_user.email', $emailExcerpt);
+        
+        $total     = $query->count();
         $totalTurn = ceil($total / $limit);
 
         // Tính toán xem với số lượng mail như này thì để delay bao nhiêu là hợp lí
-        $maxTimeCanSend  = $config['hours'] - 1; // cứ trừ 1 tiếng cho an toàn :v
-        $maxMinutes      = $maxTimeCanSend * 60;
-        $config['delay'] = ceil($maxMinutes / $total);
+        $maxTimeCanSend = $config->hours - 1; // cứ trừ 1 tiếng cho an toàn :v
+        $maxMinutes     = $maxTimeCanSend * 60;
+        $config->delay  = ceil($maxMinutes / $total);
 
         for ($i = 0; $i < $totalTurn; $i++) {
             $offset = $i * $limit;
 
-            Query::dispatch($query, $offset, $limit, $config)
+            Query::dispatch($offset, $limit, $config)
                 ->delay(now()->addSeconds(5));
         }
 

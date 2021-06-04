@@ -35,7 +35,7 @@ class MessageNotification implements ShouldQueue
         $this->receiver_email = $receiver_email;
         $this->full_name      = $full_name;
         $this->content = $content;
-
+    }
     /**
      * Execute the job.
      *
@@ -54,9 +54,6 @@ class MessageNotification implements ShouldQueue
         $sendgrid = new \SendGrid(getenv('SENDGRID_API_KEY'));
         try {
             $response = $sendgrid->send($email);
-            print $response->statusCode() . "\n";
-            print_r($response->headers());
-            print $response->body() . "\n";
         } catch (Exception $e) {
             Log::channel('daily')->info($errors->getMessage() . ' - ' . $errors->getFile() . ' - ' . $errors->getLine() . "\r\n");
         }

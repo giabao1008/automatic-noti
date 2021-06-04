@@ -2,8 +2,7 @@
 
 namespace App\Jobs;
 
-// use App\Config;
-// use App\UserProduct;
+use App\Config;
 use App\Jobs\Count;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -38,23 +37,9 @@ class GetConfig implements ShouldQueue
      */
     public function handle()
     {   
-        $config = DB::table('vi_send_mail_auto')->first();
-        
-        $timeLoop     = $config['hours'] * 3600;
-        $emailExcerpt = explode(',', $config['mail_excerpt']);
+        $config = Config::first();
 
-        $timeAgo = time() - $timeLoop;
-        $timeAgo = date('Y-m-d H:i:s', $timeAgo);
-
-        $query = DB::table('vi_product_user_product')->select('web_user.uid AS uid', 'web_user.full_name as full_name', 'web_user.email as email', 'web_user_last_active.last_active')
-            ->join('web_user', 'web_user.uid', '=', 'vi_product_user_product.uid')
-            ->join('web_user_last_active', 'web_user_last_active.uid', '=', 'vi_product_user_product.uid')
-            ->whereNotNull('web_user.email')
-            ->whereNotNull('web_user_last_active.last_active')
-            ->where('web_user_last_active.last_active', '<', $timeAgo)
-            ->whereNotIn('web_user.email', $emailExcerpt);
-
-        Count::dispatch($query, $config)
+        Count::dispatch($config)
                     ->delay(now()->addSeconds(5));
     }
 }
