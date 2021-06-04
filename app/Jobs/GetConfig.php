@@ -38,17 +38,15 @@ class GetConfig implements ShouldQueue
      */
     public function handle()
     {   
-        $configs = DB::select('select * from vi_send_mail_auto limit 1');
-
+        $config = DB::table('vi_send_mail_auto')->first();
         
-        $config       = $configs[0];
         $timeLoop     = $config['hours'] * 3600;
         $emailExcerpt = explode(',', $config['mail_excerpt']);
 
         $timeAgo = time() - $timeLoop;
         $timeAgo = date('Y-m-d H:i:s', $timeAgo);
 
-        $query = \UserProduct::select('web_user.uid AS uid', 'web_user.full_name as full_name', 'web_user.email as email', 'web_user_last_active.last_active')
+        $query = DB::table('vi_product_user_product')->select('web_user.uid AS uid', 'web_user.full_name as full_name', 'web_user.email as email', 'web_user_last_active.last_active')
             ->join('web_user', 'web_user.uid', '=', 'vi_product_user_product.uid')
             ->join('web_user_last_active', 'web_user_last_active.uid', '=', 'vi_product_user_product.uid')
             ->whereNotNull('web_user.email')
