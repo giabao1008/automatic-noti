@@ -4,14 +4,12 @@ namespace App\Jobs;
 
 use App\Config;
 use App\Jobs\Count;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Carbon\Carbon;
-use Illuminate\Contracts\Bus\Dispatcher;
-use Illuminate\Support\Facades\DB;
 
 class GetConfig implements ShouldQueue
 {
@@ -27,7 +25,7 @@ class GetConfig implements ShouldQueue
     public function __construct()
     {
         //
-        // $this->cf = $cf;    
+        // $this->cf = $cf;
     }
 
     /**
@@ -36,10 +34,19 @@ class GetConfig implements ShouldQueue
      * @return void
      */
     public function handle()
-    {   
-        $config = Config::first();
+    {
+        $config            = Config::first();
+        $time              = array();
+        $time['start_at']  = now();
+        $time['next_time'] = Carbon::now()->addHours($config['hours'])->timestamp;
 
-        Count::dispatch($config)
-                    ->delay(now()->addSeconds(5));
+        $timeStart = (int)$config['time_send'];
+        if (time() < strtotime($timeStart)) {
+            $timeDelay = strtotime($timeStart) - time();
+        } else {
+            $timeDelay = Carbon::now()->addDay()->subSecond(time() - strtotime($timeStart))->timestamp - time();
+        }
+        Count::dispatch($config, $time)
+            ->delay(now()->addSeconds($timeDelay));
     }
 }

@@ -28,10 +28,11 @@ class MessageNotification implements ShouldQueue
     // Set timeout of a job
     public $timeout = 60;
     
-    protected $receiver_email, $full_name, $content;
+    protected $receiver_email, $full_name, $content, $title;
 
-    public function __construct($receiver_email, $full_name, $content)
+    public function __construct($title, $receiver_email, $full_name, $content)
     {
+        $this->title = $title;
         $this->receiver_email = $receiver_email;
         $this->full_name      = $full_name;
         $this->content = $content;
@@ -46,8 +47,9 @@ class MessageNotification implements ShouldQueue
         
         $email    = new \SendGrid\Mail\Mail();
         $email->setFrom("info@toliha.edu.vn", "TOLIHA");
-        $email->setSubject("Nhắc nhở học tập");
-        $email->addTo("giabao1008@gmail.com", $this->full_name);
+        $email->setSubject($this->title . $this->receiver_email);
+        // $email->addTo($receiver_email, $this->full_name);
+        $email->addTo('truongnx28111994@gmail.com', $this->full_name);
         $email->addContent(
             "text/html", $this->content
         );

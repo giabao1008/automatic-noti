@@ -21,14 +21,15 @@ class Count implements ShouldQueue
      * @return void
      */
 
-    protected $query;
     protected $limit;
     protected $config;
+    protected $time;
 
-    public function __construct($config)
+    public function __construct($config, $time)
     {
         $this->limit  = 200;
         $this->config = $config;
+        $this->time = $time;
     }
 
     /**
@@ -51,20 +52,24 @@ class Count implements ShouldQueue
             ->whereNotNull('web_user.email')
             ->whereNotNull('web_user_last_active.last_active')
             ->where('web_user_last_active.last_active', '<', $timeAgo)
-            ->whereNotIn('web_user.email', $emailExcerpt);
+            ->whereNotIn('web_user.email', $emailExcerpt)
+            ->where('vi_product_user_product.expired', '>', time())
+            ->distinct('web_user.email');
         
         $total     = $query->count();
         $totalTurn = ceil($total / $limit);
 
         // Tính toán xem với số lượng mail như này thì để delay bao nhiêu là hợp lí
-        $maxTimeCanSend = $config->hours - 1; // cứ trừ 1 tiếng cho an toàn :v
+        $maxTimeCanSend = $config['hours'] - 1; // cứ trừ 1 tiếng cho an toàn :v
         $maxMinutes     = $maxTimeCanSend * 60;
-        $config->delay  = ceil($maxMinutes / $total);
-
+        $delay  = ceil($maxMinutes / $total);
+        if($delay > 5) $delay = 5;
         for ($i = 0; $i < $totalTurn; $i++) {
             $offset = $i * $limit;
+            $isLastTurn = 0; 
 
-            Query::dispatch($offset, $limit, $config)
+            if ($i == $totalTurn - 1) $isLastTurn = 1;
+            Query::dispatch($offset, $limit, $config, $isLastTurn, $delay, $this->time )
                 ->delay(now()->addSeconds(5));
         }
 

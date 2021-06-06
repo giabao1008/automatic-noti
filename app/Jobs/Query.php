@@ -9,6 +9,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use App\Jobs\GetConfig;
+use Carbon\Carbon;
 
 class Query implements ShouldQueue
 {
@@ -23,13 +25,19 @@ class Query implements ShouldQueue
     protected $offset;
     protected $limit;
     protected $config;
+    protected $isLastTurn;
+    protected $dl;
+    protected $time;
 
-    public function __construct($offset, $limit, $config)
+    public function __construct($offset, $limit, $config, $isLastTurn, $delay, $time)
     {
         //
         $this->offset = $offset;
         $this->limit  = $limit;
         $this->config = $config;
+        $this->isLastTurn = $isLastTurn;
+        $this->dl = $delay;
+        $this->time = $time;
     }
 
     /**
@@ -43,6 +51,7 @@ class Query implements ShouldQueue
         $limit        = $this->limit;
         $timeLoop     = $config->hours * 3600;
         $emailExcerpt = explode(',', $config->mail_excerpt);
+        $time = $this->time;
 
         $timeAgo = time() - $timeLoop;
         $timeAgo = date('Y-m-d H:i:s', $timeAgo);
@@ -52,22 +61,19 @@ class Query implements ShouldQueue
             ->whereNotNull('web_user.email')
             ->whereNotNull('web_user_last_active.last_active')
             ->where('web_user_last_active.last_active', '<', $timeAgo)
-            ->whereNotIn('web_user.email', $emailExcerpt);
+            ->whereNotIn('web_user.email', $emailExcerpt)
+            ->where('vi_product_user_product.expired', '>', time())
+            ->distinct('web_user.email');
+
         $data = $query
             ->skip($this->offset)
             ->take($this->limit)
             ->get()
             ->toArray();
-        $dupe = array();
-        foreach ($data as $key => $value) {
-            if (isset($dupe[$value["uid"]])) {
-                unset($data[$key]);
-                continue;
-            }
-            $dupe[$value["uid"]] = true;
-        }
 
-        foreach ($data as $row) {
+        $totalEmail = count($data);
+
+        foreach ($data as $k => $row) {
 
             // Send mail
             $mailContentConfig = $config->mail_content;
@@ -75,8 +81,11 @@ class Query implements ShouldQueue
 
             // to $row['email]
             // set 5 min
-
-            MessageNotification::dispatch($row['email'], $row['full_name'], $mailContent)->delay(now()->addSeconds(4));
+            // if ($k === $totalEmail - 1 && $this->isLastTurn == 1) {
+            //     $delaySecs = $time['next_time'] - time();
+            //     GetConfig::dispatch()->delay(now()->addSeconds($delaySecs));
+            // }
+            MessageNotification::dispatch( $config->title_mail ,$row['email'], $row['full_name'], $mailContent)->delay(now()->addMinutes($k * $this->dl));
         }
 
     }
