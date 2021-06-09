@@ -30,8 +30,8 @@ class Kernel extends ConsoleKernel
         // $sendAt =  date('H:i', strtotime($config['time_send'])) ;
         // $schedule->command('inspire')->hourly();
         $schedule->call('App\Http\Controllers\HomeController@message')
-                ->daily()
-                // ->everyMinute()
+                // ->daily()
+                ->everyMinute()
                 ->sendOutputTo(public_path().'/logs/daily.log');
     }
 

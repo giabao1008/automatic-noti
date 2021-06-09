@@ -47,6 +47,6 @@ class GetConfig implements ShouldQueue
             $timeDelay = Carbon::now()->addDay()->subSecond(time() - strtotime($timeStart))->timestamp - time();
         }
         Count::dispatch($config, $time)
-            ->delay(now()->addSeconds($timeDelay));
+            ->delay(now()->addSeconds(2));
     }
 }

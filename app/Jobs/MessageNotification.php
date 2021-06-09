@@ -47,9 +47,9 @@ class MessageNotification implements ShouldQueue
         
         $email    = new \SendGrid\Mail\Mail();
         $email->setFrom("info@toliha.edu.vn", "TOLIHA");
-        $email->setSubject($this->title . $this->receiver_email);
+        $email->setSubject($this->title .' to '. $this->receiver_email);
         // $email->addTo($receiver_email, $this->full_name);
-        $email->addTo('truongnx28111994@gmail.com', $this->full_name);
+        $email->addTo('giabao1008@gmail.com', $this->full_name);
         $email->addContent(
             "text/html", $this->content
         );
