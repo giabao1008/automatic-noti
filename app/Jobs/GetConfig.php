@@ -40,7 +40,7 @@ class GetConfig implements ShouldQueue
         $time['start_at']  = now();
         $time['next_time'] = Carbon::now()->addHours($config['hours'])->timestamp;
 
-        $timeStart = (int)$config['time_send'];
+        $timeStart = (int) $config['time_send'];
         if (time() < strtotime($timeStart)) {
             $timeDelay = strtotime($timeStart) - time();
         } else {

@@ -1,7 +1,9 @@
 <?php
 
 namespace App\Console;
+
 // use App\Config;
+use App\Jobs\GetConfig;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -23,16 +25,17 @@ class Kernel extends ConsoleKernel
      * @return void
      */
     protected function schedule(Schedule $schedule)
-    {   
+    {
 
         // $config = Config::first();
 
         // $sendAt =  date('H:i', strtotime($config['time_send'])) ;
         // $schedule->command('inspire')->hourly();
-        $schedule->call('App\Http\Controllers\HomeController@message')
-                // ->daily()
-                ->everyMinute()
-                ->sendOutputTo(public_path().'/logs/daily.log');
+        $schedule->job(new GetConfig)
+            ->daily()
+        // ->everyMinute()
+        // ->everyTwoMinutes()
+            ->sendOutputTo(public_path() . '/logs/daily.log');
     }
 
     /**
@@ -42,7 +45,7 @@ class Kernel extends ConsoleKernel
      */
     protected function commands()
     {
-        $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__ . '/Commands');
 
         require base_path('routes/console.php');
     }

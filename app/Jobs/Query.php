@@ -9,8 +9,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use App\Jobs\GetConfig;
-use Carbon\Carbon;
 
 class Query implements ShouldQueue
 {
@@ -32,12 +30,12 @@ class Query implements ShouldQueue
     public function __construct($offset, $limit, $config, $isLastTurn, $delay, $time)
     {
         //
-        $this->offset = $offset;
-        $this->limit  = $limit;
-        $this->config = $config;
+        $this->offset     = $offset;
+        $this->limit      = $limit;
+        $this->config     = $config;
         $this->isLastTurn = $isLastTurn;
-        $this->dl = $delay;
-        $this->time = $time;
+        $this->dl         = $delay;
+        $this->time       = $time;
     }
 
     /**
@@ -51,7 +49,7 @@ class Query implements ShouldQueue
         $limit        = $this->limit;
         $timeLoop     = $config->hours * 3600;
         $emailExcerpt = explode(',', $config->mail_excerpt);
-        $time = $this->time;
+        $time         = $this->time;
 
         $timeAgo = time() - $timeLoop;
         $timeAgo = date('Y-m-d H:i:s', $timeAgo);
@@ -85,7 +83,7 @@ class Query implements ShouldQueue
             //     $delaySecs = $time['next_time'] - time();
             //     GetConfig::dispatch()->delay(now()->addSeconds($delaySecs));
             // }
-            MessageNotification::dispatch( $config->title_mail ,$row['email'], $row['full_name'], $mailContent)->delay(now()->addMinutes($k * $this->dl));
+            MessageNotification::dispatch($config->title_mail, $row['email'], $row['full_name'], $mailContent)->delay(now()->addMinutes($k * $this->dl));
         }
 
     }
